@@ -11,18 +11,18 @@ labels = ['cat', 'dog']
 DIMENSIONS = (150, 150)
 
 for file in glob.glob("./dataset/examples/*"):
-    random_image = cv2.imread(file)
-    plt.imshow(random_image)
+    random_image = cv2.imread(file, 3)
+    rgb_image = random_image[..., ::-1] # bgr -> rgb
+    plt.imshow(rgb_image)
 
     random_image = cv2.resize(random_image, dsize=DIMENSIONS)
     x = image.img_to_array(random_image)
     x = np.expand_dims(random_image, axis=0)
-
     result = model.predict(x)
     print(result[0])
     if result[0] > 0.5:
-        plt.xlabel("dog")
+        plt.xlabel(labels[1])
     else:
-        plt.xlabel("cat")
+        plt.xlabel(labels[0])
 
     plt.show()

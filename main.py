@@ -1,12 +1,9 @@
-import tensorflow as tf
-from keras.layers import Dropout, MaxPooling2D, Activation
+from keras.layers import MaxPooling2D
 from tensorflow.keras.preprocessing.image import ImageDataGenerator
-from tensorflow.python.keras.callbacks import EarlyStopping, ModelCheckpoint, ReduceLROnPlateau
 import os
 from tensorflow.keras.models import Sequential
 from tensorflow.keras.optimizers import RMSprop
-from tensorflow.keras.layers import BatchNormalization, Flatten, Dense, Conv2D
-import matplotlib.pyplot as plt
+from tensorflow.keras.layers import Flatten, Dense, Conv2D
 
 EPOCH = 100
 LOSS = 'binary_crossentropy'
@@ -46,14 +43,23 @@ val_images = validation_data_generator.flow_from_directory(os.path.join(DATASET_
                                                            class_mode='binary')
 
 model = Sequential()
+
 model.add(Conv2D(16, (3, 3), activation='relu', input_shape=(150, 150, 3)))
+
 model.add(MaxPooling2D(2, 2))
+
 model.add(Conv2D(32, (3, 3), activation='relu'))
+
 model.add(MaxPooling2D(2, 2))
+
 model.add(Conv2D(64, (3, 3), activation='relu'))
+
 model.add(MaxPooling2D(2, 2))
+
 model.add(Flatten())
+
 model.add(Dense(512, activation='relu'))
+
 model.add(Dense(1, activation='sigmoid'))
 
 model.compile(loss=LOSS,
@@ -62,10 +68,8 @@ model.compile(loss=LOSS,
 
 history = model.fit_generator(
     train_images,
-    # steps_per_epoch=40,
     epochs=EPOCH,
     validation_data=val_images,
-    # validation_steps=10,
     verbose=2
 )
 
