@@ -1,20 +1,22 @@
 from keras.layers import MaxPooling2D
+from tensorflow.keras.optimizers import RMSprop
 from tensorflow.keras.preprocessing.image import ImageDataGenerator
 import os
 from tensorflow.keras.models import Sequential
-from tensorflow.keras.optimizers import RMSprop
-from tensorflow.keras.layers import Flatten, Dense, Conv2D
+from tensorflow.keras.layers import Flatten, Dense, Conv2D, Dropout
+import matplotlib.pyplot as plt
 
-EPOCH = 100
+os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
+
+EPOCH = 22
 LOSS = 'binary_crossentropy'
-OPTIMIZER = 'adam'
 Image_Width = 150
 Image_Height = 150
-DIMENSIONS = (Image_Width, Image_Height)
 Image_Channels = 3
-BATCH_SIZE = 50
+DIMENSIONS = (Image_Width, Image_Height)
+DIMENSIONS_WITH_SHAPE = (Image_Width, Image_Width, Image_Channels)
+BATCH_SIZE = 250
 DATASET_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "dataset")
-categories = ['Cat', 'Dog']
 
 train_data_generator = ImageDataGenerator(rotation_range=20,
                                           rescale=1. / 255,
@@ -44,17 +46,18 @@ val_images = validation_data_generator.flow_from_directory(os.path.join(DATASET_
 
 model = Sequential()
 
-model.add(Conv2D(16, (3, 3), activation='relu', input_shape=(150, 150, 3)))
+# model.add(Conv2D(4, (3, 3), activation='relu', input_shape=DIMENSIONS_WITH_SHAPE))
+# model.add(MaxPooling2D(2, 2))
 
+model.add(Conv2D(16, (3, 3), activation='relu'))
 model.add(MaxPooling2D(2, 2))
 
 model.add(Conv2D(32, (3, 3), activation='relu'))
-
 model.add(MaxPooling2D(2, 2))
 
 model.add(Conv2D(64, (3, 3), activation='relu'))
-
 model.add(MaxPooling2D(2, 2))
+model.add(Dropout(0.1))
 
 model.add(Flatten())
 
@@ -63,14 +66,30 @@ model.add(Dense(512, activation='relu'))
 model.add(Dense(1, activation='sigmoid'))
 
 model.compile(loss=LOSS,
-              optimizer=RMSprop(lr=0.001),
+              optimizer=RMSprop(learning_rate=0.001),
               metrics=['accuracy'])
 
-history = model.fit_generator(
-    train_images,
-    epochs=EPOCH,
-    validation_data=val_images,
-    verbose=2
-)
+history = model.fit(train_images,
+                    epochs=EPOCH,
+                    validation_data=val_images,
+                    verbose=1)
 
 model.save("model.h5")
+
+train_loss = history.history['loss']
+val_loss = history.history['val_loss']
+train_acc = history.history['accuracy']
+val_acc = history.history['val_accuracy']
+xc = range(EPOCH)
+
+plt.figure()
+plt.plot(xc, train_loss, label="train_loss")
+plt.plot(xc, val_loss, label="val_loss")
+plt.plot(xc, train_acc, label="train_acc")
+plt.plot(xc, val_acc, label="val_acc")
+plt.legend()
+plt.title("Training loss and Accuracy")
+plt.xlabel("Epoch #")
+plt.ylabel("Loss/Accuracy")
+plt.savefig("plot.jpg")
+plt.show()
