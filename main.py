@@ -49,7 +49,7 @@ model = Sequential()
 # model.add(Conv2D(4, (3, 3), activation='relu', input_shape=DIMENSIONS_WITH_SHAPE))
 # model.add(MaxPooling2D(2, 2))
 
-model.add(Conv2D(16, (3, 3), activation='relu'))
+model.add(Conv2D(16, (3, 3), activation='relu', input_shape=DIMENSIONS_WITH_SHAPE))
 model.add(MaxPooling2D(2, 2))
 
 model.add(Conv2D(32, (3, 3), activation='relu'))
@@ -61,12 +61,12 @@ model.add(Dropout(0.1))
 
 model.add(Flatten())
 
-model.add(Dense(512, activation='relu'))
+model.add(Dense(500, activation='relu'))
 
 model.add(Dense(1, activation='sigmoid'))
 
 model.compile(loss=LOSS,
-              optimizer=RMSprop(learning_rate=0.001),
+              optimizer=RMSprop(learning_rate=0.002),
               metrics=['accuracy'])
 
 history = model.fit(train_images,
